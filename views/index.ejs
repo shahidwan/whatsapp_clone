@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title><%= title %> - Chatter App</title>
+    <link rel="stylesheet" href="/navbar-footer.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="index-style.css" />
+  </head>
+  <body>
+    <%- include("partials/navbar", {user: user}) %>
+
+    <main>
+      <div class="chat-container">
+        <!-- Sidebar -->
+        <div class="chat-list">
+          <h3>Chats</h3>
+
+          <form action="/chat/search" method="GET" class="chat-search">
+            <input
+              type="text"
+              name="username"
+              placeholder="Search username..."
+              required
+            />
+            <button type="submit">Search</button>
+          </form>
+
+          <ul>
+            <% if (chatPartners && chatPartners.length > 0) { %> <%
+            chatPartners.forEach(function(partner) { %>
+            <li class="chat-item <%= chatWith === partner ? 'active' : '' %>">
+              <a href="/chat?with=<%= partner %>"><%= partner %></a>
+            </li>
+            <% }) %> <% } else { %>
+            <li>No chats yet</li>
+            <% } %>
+          </ul>
+        </div>
+
+        <!-- Chat Window -->
+        <div class="chat-window">
+          <% if (chatWith) { %>
+          <h3>Chat with <%= chatWith %></h3>
+
+          <div class="messages">
+            <% if (messages && messages.length > 0) { %> <%
+            messages.forEach(function(msg) { %>
+            <div
+              class="message <%= msg.sender === user.username ? 'sent' : 'received' %>"
+            >
+              <strong><%= msg.sender %></strong>
+              <%= msg.text %>
+            </div>
+            <% }) %> <% } else { %>
+            <p>No messages yet with <%= chatWith %></p>
+            <% } %>
+
+            <script>
+              document.addEventListener("DOMContentLoaded", () => {
+                const messagesDiv = document.querySelector(".messages");
+                if (messagesDiv) {
+                  messagesDiv.scrollTop = messagesDiv.scrollHeight; // ✅ scroll to bottom
+                }
+              });
+            </script>
+          </div>
+
+          <form class="message-form" action="/chat/send" method="POST">
+            <input type="hidden" name="receiver" value="<%= chatWith %>" />
+            <input
+              type="text"
+              name="text"
+              placeholder="Type a message..."
+              required
+            />
+            <button type="submit">Send</button>
+          </form>
+          <% } else { %>
+          <h3>Select a chat to start messaging</h3>
+          <% } %>
+        </div>
+      </div>
+    </main>
+    <%-include("partials/messages")%>
+  </body>
+</html>

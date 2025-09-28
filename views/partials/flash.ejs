@@ -1,0 +1,37 @@
+<% if (error && error.length > 0) { %>
+<div class="flash flash-error">
+  <button class="close" onclick="this.parentElement.style.display='none'">
+    ×
+  </button>
+  <% error.forEach(function(msg) { %>
+  <p><%= msg %></p>
+  <% }) %>
+</div>
+<% } %> <% if (success && success.length > 0) { %>
+<div class="flash flash-success">
+  <button class="close" onclick="this.parentElement.style.display='none'">
+    ×
+  </button>
+  <% success.forEach(function(msg) { %>
+  <p><%= msg %></p>
+  <% }) %>
+</div>
+<% } %> <% if (warning && warning.length > 0) { %>
+<div class="flash flash-warning">
+  <button class="close" onclick="this.parentElement.style.display='none'">
+    ×
+  </button>
+  <% warning.forEach(function(msg) { %>
+  <p><%= msg %></p>
+  <% }) %>
+</div>
+<% } %> <% if (info && info.length > 0) { %>
+<div class="flash flash-info">
+  <button class="close" onclick="this.parentElement.style.display='none'">
+    ×
+  </button>
+  <% info.forEach(function(msg) { %>
+  <p><%= msg %></p>
+  <% }) %>
+</div>
+<% } %>

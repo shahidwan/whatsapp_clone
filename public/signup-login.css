@@ -1,0 +1,89 @@
+/* Forms (Login/Signup) */
+/* Centering */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 120px); /* account for navbar + footer */
+  background-color: #fafafa;
+  padding: 20px;
+}
+
+/* Card */
+.auth-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+  padding: 40px 30px;
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  width: 350px;
+}
+
+/* Logo (Instagram uses image but we’ll keep text/emoji for now) */
+.auth-logo {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 30px;
+  color: #262626;
+}
+
+/* Form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.auth-form input {
+  padding: 10px;
+  border: 1px solid #dbdbdb;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background-color: #fafafa;
+}
+
+.auth-form input:focus {
+  border-color: #a8a8a8;
+  outline: none;
+}
+
+.auth-form button {
+  padding: 10px;
+  background-color: #0095f6;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.auth-form button:hover {
+  background-color: #007ac1;
+}
+
+/* Switch between login/signup */
+.switch-auth {
+  margin-top: 20px;
+  font-size: 0.85rem;
+  color: #8e8e8e;
+}
+
+.switch-auth a {
+  color: #0095f6;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.switch-auth a:hover {
+  text-decoration: underline;
+}
