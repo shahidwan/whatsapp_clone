@@ -62,23 +62,51 @@ function isAuthenticated(req, res, next) {
 }
 
 // Socket.IO logic
+// Store online users: username -> socket.id
+const onlineUsers = {};
+
 io.on("connection", (socket) => {
   console.log("🟢 User connected:", socket.id);
 
+  // When user registers themselves
+  socket.on("registerUser", (data) => {
+    if (data.username) {
+      onlineUsers[data.username] = socket.id;
+      console.log(`✅ Registered ${data.username} to socket ${socket.id}`);
+    }
+  });
+
+  // When a message is sent
   socket.on("chatMessage", async (data) => {
     const newMsg = new Message({
       sender: data.sender,
+      receiver: data.receiver,
       text: data.text,
       timestamp: new Date(),
     });
     await newMsg.save();
 
-    // Broadcast message to all connected clients
-    io.emit("chatMessage", newMsg);
+    // Send back to sender (so they see it immediately)
+    socket.emit("chatMessage", newMsg);
+
+    // Send to receiver if online
+    const receiverSocketId = onlineUsers[data.receiver];
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("chatMessage", newMsg);
+    }
   });
 
   socket.on("disconnect", () => {
     console.log("🔴 User disconnected:", socket.id);
+
+    // Clean up user mapping
+    for (let user in onlineUsers) {
+      if (onlineUsers[user] === socket.id) {
+        delete onlineUsers[user];
+        console.log(`❌ Removed ${user} from online list`);
+        break;
+      }
+    }
   });
 });
 
