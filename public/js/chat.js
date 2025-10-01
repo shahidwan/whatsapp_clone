@@ -14,15 +14,14 @@ socket.on("chatMessage", (msg) => {
   const messagesDiv = document.querySelector(".messages");
   if (!messagesDiv) return;
 
-  // Only show messages that belong in this chat window
   const chatWith = document.querySelector("input[name='receiver']")?.value;
-  if (
-    msg.sender !== currentUser &&
-    msg.sender !== chatWith &&
-    msg.receiver !== currentUser
-  ) {
-    return; // ignore unrelated messages
-  }
+
+  // Only show if this message is between current user and chatWith
+  const isForThisChat =
+    (msg.sender === currentUser && msg.receiver === chatWith) ||
+    (msg.sender === chatWith && msg.receiver === currentUser);
+
+  if (!isForThisChat) return;
 
   // Create a message bubble
   const div = document.createElement("div");
