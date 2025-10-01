@@ -15,39 +15,57 @@ function isAuthenticated(req, res, next) {
 router.get("/", isAuthenticated, async (req, res) => {
   try {
     const username = req.session.user.username;
-    const chatWith = req.query.with; // who are we chatting with?
+    const chatWith = req.query.with;
     req.session.lastChatUrl = req.originalUrl;
-    // All messages involving current user
-    const messages = await Message.find({
+
+    // First: fetch ALL messages involving current user (for partners list only)
+    const allUserMessages = await Message.find({
       $or: [{ sender: username }, { receiver: username }],
     }).sort({ createdAt: 1 });
 
-    // Extract distinct chat partners
-    const chatPartners = [
+    // Extract distinct partners
+    const rawPartners = [
       ...new Set(
-        messages.map((msg) =>
+        allUserMessages.map((msg) =>
           msg.sender === username ? msg.receiver : msg.sender
         )
       ),
-    ];
+    ].filter((partner) => partner !== username);
 
-    // If chatWith is chosen, filter messages
-    let filteredMessages = [];
+    // Validate partners exist in User collection
+    const validUsers = await User.find(
+      { username: { $in: rawPartners } },
+      "username"
+    ).lean();
+    const chatPartners = validUsers.map((u) => u.username);
+
+    // Now: fetch only messages for this chat
+    let messages = [];
     if (chatWith) {
-      filteredMessages = messages.filter(
-        (msg) =>
-          (msg.sender === username && msg.receiver === chatWith) ||
-          (msg.sender === chatWith && msg.receiver === username)
-      );
+      messages = await Message.find({
+        $or: [
+          { sender: username, receiver: chatWith },
+          { sender: chatWith, receiver: username },
+        ],
+      }).sort({ createdAt: 1 });
     }
 
     res.render("index", {
       title: "Chatter App",
       user: req.session.user,
-      messages: filteredMessages,
+      messages,
       chatPartners,
-      chatWith, // send who we're chatting with
+      chatWith,
     });
+
+    console.log(
+      "username:",
+      username,
+      "chatWith:",
+      chatWith,
+      "partners:",
+      chatPartners
+    );
   } catch (err) {
     console.error("❌ Error fetching messages:", err);
     req.flash("error", "Something went wrong while loading chats.");
@@ -59,6 +77,12 @@ router.get("/", isAuthenticated, async (req, res) => {
 router.get("/search", isAuthenticated, async (req, res) => {
   try {
     const { username } = req.query;
+
+    // ✅ Prevent chatting with self
+    if (username === req.session.user.username) {
+      req.flash("error", "You can’t chat with yourself.");
+      return res.redirect("/chat");
+    }
 
     if (!username) {
       req.flash("error", "Please enter a username.");

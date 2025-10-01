@@ -17,7 +17,7 @@ const server = http.createServer(app); // 👈 wrap Express
 const io = socketio(server); // 👈 attach Socket.IO
 
 // MongoDB connection
-const dbUrl = process.env.MONGO_URL;
+const dbUrl = process.env.MONGO_URL1;
 mongoose
   .connect(dbUrl)
   .then(() => console.log("✅ MongoDB connected"))
@@ -111,7 +111,7 @@ io.on("connection", (socket) => {
 });
 
 // Start server
-const PORT = 3000;
+const PORT = 8080;
 server.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
