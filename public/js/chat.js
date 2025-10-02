@@ -21,16 +21,29 @@ socket.on("chatMessage", (msg) => {
     (msg.sender === currentUser && msg.receiver === chatWith) ||
     (msg.sender === chatWith && msg.receiver === currentUser);
 
-  if (!isForThisChat) return;
+  if (isForThisChat) {
+    // Create a message bubble
+    const div = document.createElement("div");
+    div.classList.add("message");
+    div.classList.add(msg.sender === currentUser ? "sent" : "received");
+    div.innerHTML = `<strong>${msg.sender}</strong> ${msg.text}`;
 
-  // Create a message bubble
-  const div = document.createElement("div");
-  div.classList.add("message");
-  div.classList.add(msg.sender === currentUser ? "sent" : "received");
-  div.innerHTML = `<strong>${msg.sender}</strong> ${msg.text}`;
+    messagesDiv.appendChild(div);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
 
-  messagesDiv.appendChild(div);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  // ✅ Update sidebar no matter what (so new partners show up)
+  const sidebarList = document.querySelector(".chat-list ul");
+  if (sidebarList) {
+    const partner = msg.sender === currentUser ? msg.receiver : msg.sender;
+
+    if (!sidebarList.querySelector(`a[href="/chat?with=${partner}"]`)) {
+      const li = document.createElement("li");
+      li.classList.add("chat-item");
+      li.innerHTML = `<a href="/chat?with=${partner}">${partner}</a>`;
+      sidebarList.appendChild(li);
+    }
+  }
 });
 
 // Intercept message form submit → send over socket
@@ -53,3 +66,21 @@ if (form) {
     }
   });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleBtn = document.querySelector(".toggle-sidebar");
+  const sidebar = document.querySelector(".chat-list");
+  const overlay = document.createElement("div");
+  overlay.classList.add("overlay");
+  document.body.appendChild(overlay);
+
+  toggleBtn.addEventListener("click", () => {
+    sidebar.classList.add("active");
+    overlay.classList.add("active");
+  });
+
+  overlay.addEventListener("click", () => {
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
+  });
+});

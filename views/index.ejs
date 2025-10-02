@@ -17,7 +17,7 @@
     <main>
       <div class="chat-container">
         <!-- Sidebar -->
-        <div class="chat-list">
+        <div class="chat-list" id="chatList">
           <h3>Chats</h3>
 
           <form action="/chat/search" method="GET" class="chat-search">
@@ -42,8 +42,18 @@
           </ul>
         </div>
 
+        <!-- Overlay for mobile -->
+        <div
+          class="chat-list-overlay"
+          id="chatListOverlay"
+          aria-hidden="true"
+        ></div>
+
         <!-- Chat Window -->
         <div class="chat-window">
+          <!-- Toggle button for mobile -->
+          <button class="toggle-sidebar" id="toggleSidebar">☰</button>
+
           <% if (chatWith) { %>
           <h3><%= chatWith %></h3>
 
@@ -59,15 +69,6 @@
             <% }) %> <% } else { %>
             <p>No messages yet with <%= chatWith %></p>
             <% } %>
-
-            <script>
-              document.addEventListener("DOMContentLoaded", () => {
-                const messagesDiv = document.querySelector(".messages");
-                if (messagesDiv) {
-                  messagesDiv.scrollTop = messagesDiv.scrollHeight; // ✅ scroll to bottom
-                }
-              });
-            </script>
           </div>
 
           <form class="message-form" action="/chat/send" method="POST">
@@ -85,6 +86,16 @@
           <% } %>
         </div>
       </div>
+
+      <script>
+        // ✅ Keep your auto-scroll here if you like
+        document.addEventListener("DOMContentLoaded", () => {
+          const messagesDiv = document.querySelector(".messages");
+          if (messagesDiv) {
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+          }
+        });
+      </script>
     </main>
     <%-include("partials/messages")%>
     <script src="/socket.io/socket.io.js"></script>
